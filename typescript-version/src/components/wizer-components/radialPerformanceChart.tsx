@@ -49,105 +49,73 @@ const RadialPerformanceChart: React.FC = () => {
   }
 
   return (
-    <div className='flex items-start gap-8 justify-between p-4'>
-      {/* Left: Radial Chart */}
-      <div className='relative'>
-        <h2 className='text-lg font-bold mb-4'>Average Performance by Team</h2>
-        <svg width={chartSize} height={chartSize}>
-          {/* Draw base circles */}
-          {data.map((segment, index) => (
-            <path
-              key={`base-${index}`}
-              d={calculateBaseCirclePath(segment.radius)}
-              stroke='#e0e0e0' // Light gray for the base circle
-              strokeWidth='1'
-              fill='none'
-            />
-          ))}
-          {/* Draw each segment */}
-          {data.map((segment, index) => (
-            <path
-              key={index}
-              d={calculateArcPath(segment.radius, segment.percentage)}
-              stroke={segment.color}
-              strokeWidth='8'
-              fill='none'
-            />
-          ))}
+    <div className='relative flex-1'>
+      <svg width={chartSize} height={chartSize}>
+        {/* Draw base circles */}
+        {data.map((segment, index) => (
+          <path
+            key={`base-${index}`}
+            d={calculateBaseCirclePath(segment.radius)}
+            stroke='#e0e0e0' // Light gray for the base circle
+            strokeWidth='1'
+            fill='none'
+          />
+        ))}
+        {/* Draw each segment */}
+        {data.map((segment, index) => (
+          <path
+            key={index}
+            d={calculateArcPath(segment.radius, segment.percentage)}
+            stroke={segment.color}
+            strokeWidth='8'
+            fill='none'
+          />
+        ))}
 
-          {/* Center Dot */}
-          <circle cx={chartCenter} cy={chartCenter} r='8' fill='#000' />
+        {/* Center Dot */}
+        <circle cx={chartCenter} cy={chartCenter} r='8' fill='#000' />
 
-          {/* Labels */}
-          {data.map((segment, index) => {
-            const labelAngle = -Math.PI / 2 + (segment.percentage / 100) * Math.PI // Middle of arc
+        {/* Labels */}
+        {data.map((segment, index) => {
+          const labelAngle = -Math.PI / 2 + (segment.percentage / 100) * Math.PI // Middle of arc
 
-            const labelX = chartCenter + (segment.radius + 15) * Math.cos(labelAngle)
-            const labelY = chartCenter + (segment.radius + 15) * Math.sin(labelAngle)
+          const labelX = chartCenter + (segment.radius + 15) * Math.cos(labelAngle)
+          const labelY = chartCenter + (segment.radius + 15) * Math.sin(labelAngle)
 
-            return (
-              <g key={index}>
-                <line
-                  x1={chartCenter + segment.radius * Math.cos(labelAngle)}
-                  y1={chartCenter + segment.radius * Math.sin(labelAngle)}
-                  x2={labelX}
-                  y2={labelY}
-                  stroke='#000'
-                  strokeWidth='1'
-                />
-                <text
-                  x={labelX}
-                  y={labelY}
-                  fontSize='12'
-                  textAnchor={labelX > chartCenter ? 'start' : 'end'}
-                  alignmentBaseline='middle'
-                  className='font-bold'
-                >
-                  {segment.label} ({segment.percentage}%)
-                </text>
-                <text
-                  x={labelX}
-                  y={labelY + 12}
-                  fontSize='10'
-                  textAnchor={labelX > chartCenter ? 'start' : 'end'}
-                  alignmentBaseline='middle'
-                  fill='#555'
-                >
-                  {segment.votes} people voted
-                </text>
-              </g>
-            )
-          })}
-        </svg>
-      </div>
-
-      {/* Right: Top Performers List */}
-      <div className='flex flex-col'>
-        <div className='mb-6'>
-          <h3 className='text-md font-bold'>Correct Decisions Top Performers</h3>
-          <ol className='list-decimal list-inside text-sm'>
-            <li>xxx</li>
-            <li>xxx</li>
-            <li>xxx</li>
-          </ol>
-        </div>
-        <div className='mb-6'>
-          <h3 className='text-md font-bold'>Voter Participation Top Performers</h3>
-          <ol className='list-decimal list-inside text-sm'>
-            <li>xxx</li>
-            <li>xxx</li>
-            <li>xxx</li>
-          </ol>
-        </div>
-        <div>
-          <h3 className='text-md font-bold'>Low Participation Alert</h3>
-          <ol className='list-decimal list-inside text-sm'>
-            <li>xxx</li>
-            <li>xxx</li>
-            <li>xxx</li>
-          </ol>
-        </div>
-      </div>
+          return (
+            <g key={index}>
+              <line
+                x1={chartCenter + segment.radius * Math.cos(labelAngle)}
+                y1={chartCenter + segment.radius * Math.sin(labelAngle)}
+                x2={labelX}
+                y2={labelY}
+                stroke='#000'
+                strokeWidth='1'
+              />
+              <text
+                x={labelX}
+                y={labelY}
+                fontSize='12'
+                textAnchor={labelX > chartCenter ? 'start' : 'end'}
+                alignmentBaseline='middle'
+                className='font-bold'
+              >
+                {segment.label} ({segment.percentage}%)
+              </text>
+              <text
+                x={labelX}
+                y={labelY + 12}
+                fontSize='10'
+                textAnchor={labelX > chartCenter ? 'start' : 'end'}
+                alignmentBaseline='middle'
+                fill='#555'
+              >
+                {segment.votes} people voted
+              </text>
+            </g>
+          )
+        })}
+      </svg>
     </div>
   )
 }

@@ -1,9 +1,54 @@
-import RadialPerformanceChart from '@/components/wizer-components/radialPerformanceChart'
+import React from 'react'
 
-const PerformanceView = () => {
+import RadialPerformanceChart from '@/components/wizer-components/radialPerformanceChart'
+import StakeholderCards from '@/components/wizer-components/stakeholderCard'
+
+const PerformanceView: React.FC = () => {
+  const performanceList = () => {
+    return (
+      <div className='flex flex-col flex-1'>
+        <div className='mb-6'>
+          <h3 className='text-md font-normal'>
+            <strong>Correct Decisions</strong> Top Performers
+          </h3>
+          <ol className='list-decimal list-inside text-sm'>
+            <li>xxx</li>
+            <li>xxx</li>
+            <li>xxx</li>
+          </ol>
+        </div>
+        <div className='mb-6'>
+          <h3 className='text-md font-normal'>
+            <strong>Voter Participation</strong> Top Performers
+          </h3>
+          <ol className='list-decimal list-inside text-sm'>
+            <li>xxx</li>
+            <li>xxx</li>
+            <li>xxx</li>
+          </ol>
+        </div>
+        <div>
+          <h3 className='text-md font-bold'>Low Participation Alert</h3>
+          <ol className='list-decimal list-inside text-sm'>
+            <li>xxx</li>
+            <li>xxx</li>
+            <li>xxx</li>
+          </ol>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <RadialPerformanceChart />
+    <div className='items-start gap-8 p-4 border-[1px]'>
+      <h2 className='text-lg mb-4'>Average Performance by Team</h2>
+      <div className='mt-[14px] flex'>
+        {/* Left: Radial Chart */}
+        <RadialPerformanceChart />
+        {/* Right: Top Performers List */}
+        {performanceList()}
+      </div>
+      <StakeholderCards />
     </div>
   )
 }
