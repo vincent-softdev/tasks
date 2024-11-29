@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid'
 import StatsView from '@/views/engaging-management/stats/statsView'
 import type { IStatsViewProps, TabKeys } from '@/types/engagementTypes'
 import EngagedView from '@/views/engaging-management/engage/engagedView'
+import PerformanceView from '@/views/engaging-management/performance/performanceView'
 
 const WizerTaskPage = () => {
   // Mock data for each tab
@@ -35,6 +36,9 @@ const WizerTaskPage = () => {
       {/* Tab Selector and Stats View */}
       <Grid item xs={12}>
         <EngagedView />
+      </Grid>
+      <Grid item xs={12}>
+        <PerformanceView />
       </Grid>
     </Grid>
   )

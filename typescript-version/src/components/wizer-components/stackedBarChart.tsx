@@ -24,7 +24,7 @@ const StackedBarChart: React.FC = () => {
   const colors = ['#4dc9f0', '#7b69af', '#3edaa6', '#505db0']
 
   // Chart dimensions
-  const baseWidth = 700 // Base width for scale = 1.0
+  const baseWidth = 600 // Base width for scale = 1.0
   const chartHeight = data.length * 50 + 50 // Fixed height
   const maxTotal = 22 // Max X-axis value
   const tickInterval = 5 // Interval for X-axis labels
@@ -57,11 +57,11 @@ const StackedBarChart: React.FC = () => {
   const scaledWidth = baseWidth * scale
 
   return (
-    <div className='p-6 relative' ref={containerRef}>
+    <div className='p-6 relative ' ref={containerRef}>
       <h2 className='text-lg font-bold mb-[100px]'>Engagement at a Glance</h2>
       {/* Y-axis title */}
-      <div className='flex flex-col absolute gap-4 text-end max-w-[170px]'>
-        <text fontSize='14' fill='#555' textAnchor='middle' alignmentBaseline='middle'>
+      <div className='flex flex-col absolute gap-4 text-end max-w-[170px] pr-5'>
+        <text className='font-medium' fontSize='14' fill='#555' textAnchor='middle' alignmentBaseline='middle'>
           GROUPS
         </text>
         {/* Y-axis labels */}
@@ -80,7 +80,7 @@ const StackedBarChart: React.FC = () => {
         </div>
       </div>
 
-      <svg width={scaledWidth + 100} className='mt-5 ml-[64px]' height={chartHeight + 10}>
+      <svg width={scaledWidth + 140} className='mt-5 ml-[48px]' height={chartHeight + 10}>
         {/* Bars */}
         {data.map((d, i) => {
           let xOffset = 120 // Starting X position for the bar (adjusted for spacing)
@@ -141,7 +141,7 @@ const StackedBarChart: React.FC = () => {
       </svg>
 
       {/* Legend */}
-      <div className='mt-4 flex absolute top-0 right-0 flex-col'>
+      <div className='mt-4 flex absolute top-[70px] right-0 flex-col'>
         {colors.map((color, i) => (
           <div key={i} className='flex items-center ml-4 gap-2 justify-between'>
             <span className='ml-2 text-sm'>Type of Question</span>
@@ -155,7 +155,7 @@ const StackedBarChart: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className='text-center'>
+      <div className='text-end'>
         <p className='font-semibold'>NUMBER OF QUESTIONS ASKED ({data.reduce((sum, d) => sum + d.total, 0)})</p>
       </div>
     </div>

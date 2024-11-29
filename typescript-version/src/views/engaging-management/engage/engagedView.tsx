@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 
 import TabSelector from '@/components/wizer-components/tapSelector'
 import StackedBarChart from '@/components/wizer-components/stackedBarChart'
+import ParticipationRate from '@/components/wizer-components/participationRate'
 
 type TabKeys =
   | 'Decision Profiles'
@@ -27,8 +28,13 @@ const EngagedView = () => {
         onSelect={tab => setSelectedTab(tab as TabKeys)} // Cast the tab to TabKeys
       />
       {selectedTab == 'Participation Metrics' && (
-        <div>
-          <StackedBarChart />
+        <div className='flex'>
+          <div className='w-[50%] pl-0 pr-8 border-[#d7d2e7] border-[1px]'>
+            <StackedBarChart />
+          </div>
+          <div className='w-[50%] pl-0 pr-8 border-[#d7d2e7] border-[1px]'>
+            <ParticipationRate />
+          </div>
         </div>
       )}
       {selectedTab != 'Participation Metrics' && (
