@@ -1,3 +1,6 @@
+# Description
+This is not my repository. I have cloned the project from the ThemeSelection team to practice my skill set. Therefore, I am keeping the information below to help more people recognize their work.
+
 <p align="center"></p>
 
 <p align="center">
