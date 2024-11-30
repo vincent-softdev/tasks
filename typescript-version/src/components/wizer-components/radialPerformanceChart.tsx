@@ -1,97 +1,72 @@
 import React from 'react'
 
-const RadialPerformanceChart: React.FC = () => {
-  // Mock data for radial chart
-  const data = [
-    { label: 'Admin', percentage: 33, votes: '1/3', color: '#4dc9f0', radius: 70 },
-    { label: 'Accounting', percentage: 50, votes: '1/2', color: '#68af92', radius: 55 },
-    { label: 'Design', percentage: 100, votes: '1/1', color: '#a07ffc', radius: 40 },
-    { label: 'Customer Service', percentage: 60, votes: '3/5', color: '#ffd420', radius: 85 },
-    { label: 'Sales', percentage: 87.5, votes: '7/8', color: '#fc8dca', radius: 100 }
-  ]
+import {
+  calculateArcPath,
+  calculateBaseCirclePath,
+  splitText,
+  calculateMidpoint,
+  calculateStraightLineCoordinates
+} from '@/utils/radialChartUtils'
 
+type RadialPerformanceChartProps = {
+  data: {
+    label: string
+    percentage: number
+    votes: string
+    color: string
+    radius: number
+  }[]
+}
+
+const RadialPerformanceChart = (props: RadialPerformanceChartProps) => {
   const chartCenter = 150 // Center of the chart
   const chartSize = 350 // Total chart width/height
 
-  // Calculate the arc path for each segment
-  const calculateArcPath = (radius: number, percentage: number) => {
-    if (percentage === 100) {
-      // Handle full circle separately
-      return `
-        M ${chartCenter} ${chartCenter - radius}
-        A ${radius} ${radius} 0 1 1 ${chartCenter} ${chartCenter + radius}
-        A ${radius} ${radius} 0 1 1 ${chartCenter} ${chartCenter - radius}
-      `
-    }
-
-    const startAngle = Math.random() * 2 * Math.PI // Start from top
-    const endAngle = startAngle + (percentage / 100) * 2 * Math.PI // Calculate end angle
-    const largeArcFlag = percentage > 50 ? 1 : 0
-
-    const startX = chartCenter + radius * Math.cos(startAngle)
-    const startY = chartCenter + radius * Math.sin(startAngle)
-    const endX = chartCenter + radius * Math.cos(endAngle)
-    const endY = chartCenter + radius * Math.sin(endAngle)
-
-    return `
-      M ${startX} ${startY}
-      A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}
-    `
-  }
-
-  // Calculate the full circle base path
-  const calculateBaseCirclePath = (radius: number) => {
-    return `
-      M ${chartCenter} ${chartCenter - radius}
-      A ${radius} ${radius} 0 1 1 ${chartCenter} ${chartCenter + radius}
-      A ${radius} ${radius} 0 1 1 ${chartCenter} ${chartCenter - radius}
-    `
-  }
+  let cumulativeAngle = (-Math.PI * Math.random()) / 2 // Random initial start angle
 
   return (
     <div className='relative flex-1'>
       <svg width={chartSize} height={chartSize}>
         {/* Draw base circles */}
-        {data.map((segment, index) => (
+        {props.data.map((segment, index) => (
           <path
             key={`base-${index}`}
-            d={calculateBaseCirclePath(segment.radius)}
+            d={calculateBaseCirclePath(segment.radius, chartCenter)}
             stroke='#e0e0e0' // Light gray for the base circle
             strokeWidth='1'
             fill='none'
           />
         ))}
         {/* Draw each segment */}
-        {data.map((segment, index) => (
-          <path
-            key={index}
-            d={calculateArcPath(segment.radius, segment.percentage)}
-            stroke={segment.color}
-            strokeWidth='8'
-            fill='none'
-          />
-        ))}
 
+        {props.data.map((segment, index) => {
+          const arcPath = calculateArcPath(segment.radius, segment.percentage, chartCenter, cumulativeAngle)
+
+          cumulativeAngle += (segment.percentage / 100) * 2 * Math.PI // Update cumulative angle for the next segment
+
+          return <path key={index} d={arcPath} stroke={segment.color} strokeWidth='8' fill='none' />
+        })}
         {/* Center Dot */}
         <circle cx={chartCenter} cy={chartCenter} r='8' fill='#000' />
-
         {/* Labels */}
-        {data.map((segment, index) => {
-          const labelAngle = -Math.PI / 2 + (segment.percentage / 100) * Math.PI // Middle of arc
+        {props.data.map((segment, index) => {
+          const midpoint = calculateMidpoint(segment.radius, segment.percentage, chartCenter)
 
-          const labelX = chartCenter + (segment.radius + 15) * Math.cos(labelAngle)
-          const labelY = chartCenter + (segment.radius + 15) * Math.sin(labelAngle)
+          const labelX =
+            chartCenter + (segment.radius + 40) * Math.cos(-Math.PI / 2 + (segment.percentage / 100) * Math.PI)
+
+          const labelY =
+            chartCenter + (segment.radius + 40) * Math.sin(-Math.PI / 2 + (segment.percentage / 100) * Math.PI)
+
+          const { x2, y2 } = calculateStraightLineCoordinates(midpoint.x, midpoint.y, labelX, labelY)
+          const labelLines = splitText(segment.label, 10)
 
           return (
             <g key={index}>
-              <line
-                x1={chartCenter + segment.radius * Math.cos(labelAngle)}
-                y1={chartCenter + segment.radius * Math.sin(labelAngle)}
-                x2={labelX}
-                y2={labelY}
-                stroke='#000'
-                strokeWidth='1'
-              />
+              {/* Connecting Line */}
+              <line x1={midpoint.x} y1={midpoint.y} x2={x2} y2={y2} stroke='#000' strokeWidth='1' />
+
+              {/* Label Text */}
               <text
                 x={labelX}
                 y={labelY}
@@ -100,11 +75,18 @@ const RadialPerformanceChart: React.FC = () => {
                 alignmentBaseline='middle'
                 className='font-bold'
               >
-                {segment.label} ({segment.percentage}%)
+                {labelLines.map((line, i) => (
+                  <tspan key={i} x={labelX} dy={i === 0 ? '' : '1.2em'}>
+                    {line}
+                  </tspan>
+                ))}
+                ({segment.percentage}%)
               </text>
+
+              {/* Votes Text */}
               <text
                 x={labelX}
-                y={labelY + 12}
+                y={labelY + labelLines.length * 14}
                 fontSize='10'
                 textAnchor={labelX > chartCenter ? 'start' : 'end'}
                 alignmentBaseline='middle'

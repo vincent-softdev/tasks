@@ -1,20 +1,25 @@
 import React from 'react'
 
-const StakeholderCards: React.FC = () => {
+type StakeholderCardsProps = {
+  data: (
+    | {
+        name: string
+        title: string
+        participation: number
+        image: string
+      }
+    | {
+        name: string
+        participation: null
+        image: null
+        title?: undefined
+      }
+  )[]
+}
+
+const StakeholderCards = (props: StakeholderCardsProps) => {
   // Mock data for stakeholders
-  const stakeholders = [
-    {
-      name: 'Talia Franco',
-      title: 'Designer, Marketing Team',
-      participation: 75,
-      image:
-        'https://imgs.search.brave.com/49ogd4rOP14ONhT6mrJ7zWxdIklksiQ-C_veJs54ha4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvOTM4/NzA5MzYyL3Bob3Rv/L3BvcnRyYWl0LW9m/LWEtZ2lybC5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9VVFH/WHBlaUxySTc4bk8x/QjlwZVVuMEQwZkNT/UnJtLUo4eG9oTVdH/Mkxtcz0' // Replace with actual profile image URLs
-    },
-    { name: 'Employee Card', participation: null, image: null },
-    { name: 'Employee Card', participation: null, image: null },
-    { name: 'Employee Card', participation: null, image: null },
-    { name: 'Employee Card', participation: null, image: null }
-  ]
+  const stakeholders = props.data
 
   return (
     <div className='p-4'>

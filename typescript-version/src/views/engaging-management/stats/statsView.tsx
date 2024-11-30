@@ -20,12 +20,14 @@ const StatsView = (props: Record<TabKeys, IStatsViewProps>) => {
     {
       title: 'PARTICIPATION RATE',
       data: `${props[selectedTab].participationRate}`,
-      explaination: '% of People Engaged'
+      explaination: '% of People Engaged',
+      hints: `This is the percentage of people who engaged this ${selectedTab}`
     },
     {
       title: 'RECOMMENDATIONS',
       data: `${props[selectedTab].recommendations}`,
-      explaination: 'number of recommendations'
+      explaination: 'number of recommendations',
+      hints: `This is total recommendations this ${selectedTab}`
     }
   ]
 

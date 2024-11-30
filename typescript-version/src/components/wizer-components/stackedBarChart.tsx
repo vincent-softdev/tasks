@@ -1,24 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react'
 
-const StackedBarChart: React.FC = () => {
+type StackedBarChartProps = {
+  data: {
+    group: string
+    values: number[]
+    total: number
+  }[]
+}
+
+const StackedBarChart = (props: StackedBarChartProps) => {
   // Mock data
-  const data = [
-    {
-      group: 'Internal employees',
-      values: [5, 3, 3, 2],
-      total: 13
-    },
-    {
-      group: 'Indigenous communities',
-      values: [7, 6, 5, 2],
-      total: 20
-    },
-    {
-      group: 'External regional stakeholders',
-      values: [4, 5, 4, 2],
-      total: 15
-    }
-  ]
+  const data = props.data
 
   // Colors for each type of question
   const colors = ['#4dc9f0', '#7b69af', '#3edaa6', '#505db0']
@@ -57,7 +49,7 @@ const StackedBarChart: React.FC = () => {
   const scaledWidth = baseWidth * scale
 
   return (
-    <div className='p-6 relative ' ref={containerRef}>
+    <div className='p-6 relative mr-4 ' ref={containerRef}>
       <h2 className='text-lg font-bold mb-[100px]'>Engagement at a Glance</h2>
       {/* Y-axis title */}
       <div className='flex flex-col absolute gap-4 text-end max-w-[170px] pr-5'>

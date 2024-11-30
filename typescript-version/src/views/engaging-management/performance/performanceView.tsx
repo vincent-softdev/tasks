@@ -3,7 +3,32 @@ import React from 'react'
 import RadialPerformanceChart from '@/components/wizer-components/radialPerformanceChart'
 import StakeholderCards from '@/components/wizer-components/stakeholderCard'
 
-const PerformanceView: React.FC = () => {
+type PerformanceViewProps = {
+  radialPerformanceChartData: {
+    label: string
+    percentage: number
+    votes: string
+    color: string
+    radius: number
+  }[]
+
+  stakeholdersData: (
+    | {
+        name: string
+        title: string
+        participation: number
+        image: string
+      }
+    | {
+        name: string
+        participation: null
+        image: null
+        title?: undefined
+      }
+  )[]
+}
+
+const PerformanceView = (props: PerformanceViewProps) => {
   const performanceList = () => {
     return (
       <div className='flex flex-col flex-1'>
@@ -44,11 +69,11 @@ const PerformanceView: React.FC = () => {
       <h2 className='text-lg mb-4'>Average Performance by Team</h2>
       <div className='mt-[14px] flex'>
         {/* Left: Radial Chart */}
-        <RadialPerformanceChart />
+        <RadialPerformanceChart data={props.radialPerformanceChartData} />
         {/* Right: Top Performers List */}
         {performanceList()}
       </div>
-      <StakeholderCards />
+      <StakeholderCards data={props.stakeholdersData} />
     </div>
   )
 }

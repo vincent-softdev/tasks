@@ -1,41 +1,24 @@
 import React from 'react'
 
-const ParticipationRate: React.FC = () => {
-  // Mock data
-  const data = [
-    { label: 'Internal Employees', value: 50, color: '#3f5185' },
-    { label: 'Indigenous Communities', value: 19, color: '#4dc9f0' },
-    { label: 'External Regional Stakeholders', value: 31, color: '#7b69af' }
-  ]
+import { calculateTotalValue, calculateArcPath, calculateLabelPosition, splitText } from '@/utils/chartUtils'
 
+type ParticipationRateProps = {
+  data: {
+    label: string
+    value: number
+    color: string
+  }[]
+}
+
+const ParticipationRate: React.FC<ParticipationRateProps> = ({ data }) => {
   // Total value for the chart
-  const total = data.reduce((sum, segment) => sum + segment.value, 0)
+  const total = calculateTotalValue(data)
 
   // Dimensions
-  const centerX = 150
-  const centerY = 150
-  const radius = 100
-  const innerRadius = 50 // Creates the "doughnut" effect
-
-  // Function to calculate the SVG arc path
-  const calculateArcPath = (startAngle: number, endAngle: number, radius: number) => {
-    const startX = centerX + radius * Math.cos(startAngle)
-    const startY = centerY + radius * Math.sin(startAngle)
-    const endX = centerX + radius * Math.cos(endAngle)
-    const endY = centerY + radius * Math.sin(endAngle)
-
-    const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0
-
-    return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`
-  }
-
-  // Function to calculate the position for labels
-  const calculateLabelPosition = (angle: number, radius: number) => {
-    const x = centerX + radius * Math.cos(angle)
-    const y = centerY + radius * Math.sin(angle)
-
-    return { x, y }
-  }
+  const centerX = 200
+  const centerY = 200
+  const radius = 130
+  const innerRadius = 80 // Creates the "doughnut" effect
 
   // Create segments
   let cumulativeAngle = -Math.PI / 2 // Start from the top (12 o'clock position)
@@ -44,18 +27,24 @@ const ParticipationRate: React.FC = () => {
     const startAngle = cumulativeAngle
     const angle = (segment.value / total) * 2 * Math.PI
     const endAngle = startAngle + angle
+    const midAngle = startAngle + angle / 2 // Midpoint of the arc for labels and lines
 
     cumulativeAngle = endAngle
 
+    const arcPath = calculateArcPath(startAngle, endAngle, radius, centerX, centerY)
+
     return {
       path:
-        calculateArcPath(startAngle, endAngle, radius) +
+        `M ${arcPath.startX} ${arcPath.startY} A ${radius} ${radius} 0 ${
+          arcPath.largeArcFlag
+        } 1 ${arcPath.endX} ${arcPath.endY}` +
         ` L ${centerX + innerRadius * Math.cos(endAngle)} ${
           centerY + innerRadius * Math.sin(endAngle)
-        } A ${innerRadius} ${innerRadius} 0 ${endAngle - startAngle > Math.PI ? 1 : 0} 0 ${
-          centerX + innerRadius * Math.cos(startAngle)
-        } ${centerY + innerRadius * Math.sin(startAngle)} Z`,
-      labelPosition: calculateLabelPosition(startAngle + angle / 2, radius + 30),
+        } A ${innerRadius} ${innerRadius} 0 ${
+          endAngle - startAngle > Math.PI ? 1 : 0
+        } 0 ${centerX + innerRadius * Math.cos(startAngle)} ${centerY + innerRadius * Math.sin(startAngle)} Z`,
+      labelPosition: calculateLabelPosition(midAngle, radius + 30, centerX, centerY),
+      linePosition: calculateLabelPosition(midAngle, radius, centerX, centerY),
       color: segment.color,
       label: segment.label,
       value: segment.value
@@ -66,27 +55,45 @@ const ParticipationRate: React.FC = () => {
     <div className='p-6'>
       <h2 className='text-lg font-bold mb-4'>Participation Rate</h2>
       <div className='flex justify-center'>
-        <svg width='300' height='300'>
+        <svg width='500' height='500' viewBox='-50 0 500 500'>
           {/* Doughnut Segments */}
           {segments.map((segment, index) => (
-            <path key={index} d={segment.path} fill={segment.color} stroke='#fff' strokeWidth='2' />
+            <path key={index} d={segment.path} fill={segment.color} strokeWidth='2' />
           ))}
 
           {/* Labels */}
           {segments.map((segment, index) => {
-            const { x, y } = segment.labelPosition
+            const { x } = segment.labelPosition
+            const { x: lineX, y: lineY } = segment.linePosition
+            const labelLines = splitText(segment.label, 10) // Split text into lines with max 10 characters
 
             return (
               <g key={index}>
-                <line x1={x} y1={y} x2={x > centerX ? x + 20 : x - 20} y2={y} stroke='#000' strokeWidth='1' />
+                {/* Connecting Line */}
+                <line
+                  x1={lineX < centerX ? lineX + 20 : lineX - 20}
+                  y1={lineY}
+                  x2={x > centerX ? x + 20 : x - 20}
+                  y2={lineY}
+                  stroke='#000'
+                  strokeWidth='1'
+                />
+                {/* Label Text */}
                 <text
-                  x={x > centerX ? x + 25 : x - 25}
-                  y={y}
+                  x={lineX < centerX ? lineX + 20 : lineX - 20}
+                  y={lineY}
                   fontSize='12'
                   textAnchor={x > centerX ? 'start' : 'end'}
                   alignmentBaseline='middle'
                 >
-                  {segment.value}% {segment.label}
+                  <tspan x={x > centerX ? x + 25 : x - 25} className='font-bold' dy='0'>
+                    {segment.value}%
+                  </tspan>
+                  {labelLines.map((line, i) => (
+                    <tspan key={i} x={x > centerX ? x + 25 : x - 25} dy='1.4em'>
+                      {line}
+                    </tspan>
+                  ))}
                 </text>
               </g>
             )
