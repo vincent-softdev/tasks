@@ -65,8 +65,8 @@ const PerformanceView = (props: PerformanceViewProps) => {
   }
 
   return (
-    <div className='items-start gap-8 p-4 border-[1px]'>
-      <h2 className='text-lg mb-4'>Average Performance by Team</h2>
+    <div className='items-start gap-8 p-4 border-[1px] border-[#d7d2e7]'>
+      <h2 className='text-lg mb-10'>Average Performance by Team</h2>
       <div className='mt-[14px] flex'>
         {/* Left: Radial Chart */}
         <RadialPerformanceChart data={props.radialPerformanceChartData} />

@@ -47,7 +47,9 @@ const EngagedView = (props: EngagedViewProps) => {
               <StackedBarChart data={props.stackedBarData} />
               <div className='bg-[#d7d2e7] px-6 h-[70px] flex items-center'>
                 <p className='text-black '>
-                  <strong>INSIGHTS</strong> Of the (48) questions asked...(ML generated copy here)
+                  <strong>INSIGHTS</strong> Of the (
+                  {props.stackedBarData.reduce((sum, e) => sum + e.values.reduce((sum, _) => sum + _), 0)}) questions
+                  asked...(ML generated copy here)
                 </p>
               </div>
             </div>
@@ -55,8 +57,9 @@ const EngagedView = (props: EngagedViewProps) => {
               <ParticipationRate data={props.participationRateData} />
               <div className='bg-[#d7d2e7] px-6 h-[70px] flex items-center'>
                 <p className='text-black '>
-                  <strong>INSIGHTS</strong> The percentage of people that participated was 64% (127 people). Of those
-                  127 people... (ML generated copy here)
+                  <strong>INSIGHTS</strong> The percentage of people that participated was 64% (
+                  {props.participationRateData.reduce((sum, e) => sum + e.value, 0)} people). Of those{' '}
+                  {props.participationRateData.reduce((sum, e) => sum + e.value, 0)} people... (ML generated copy here)
                 </p>
               </div>
             </div>
@@ -64,7 +67,9 @@ const EngagedView = (props: EngagedViewProps) => {
         </div>
       )}
       {selectedTab != 'Participation Metrics' && (
-        <div>We are working on it! Please select Participation Metrics instead</div>
+        <div className='h-[100px] w-full text-center pt-10 border-[1px] border-[#d7d2e7]'>
+          We are working on it! Please select <strong>Participation Metrics</strong> instead
+        </div>
       )}
     </>
   )

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { calculateArcPath, calculateLabelPosition, splitText } from '@/utils/chartUtils'
-import { calculateBaseCirclePath } from '@/utils/radialChartUtils'
+import { calculateBaseCirclePath, calculateStraightLineCoordinates } from '@/utils/radialChartUtils'
 
 type RadialPerformanceChartProps = {
   data: {
@@ -20,40 +20,52 @@ const RadialPerformanceChart: React.FC<RadialPerformanceChartProps> = ({ data })
   // Calculate total percentages for normalizing the arcs
   const totalPercentage = 100
 
-  // Keep track of the cumulative angle
-  let cumulativeAngle = -Math.PI / 2 // Random initial start angle
+  // Define label positions
+  const labelPositions = [
+    { x: chartCenter + 130, y: chartCenter - 50 }, // Top-left
+    { x: chartCenter + 130, y: chartCenter + 50 }, // Bottom-left
+    { x: chartCenter + 130, y: chartCenter + 10 }, // Bottom-left
+    { x: chartCenter + 20, y: chartSize - 400 }, // Bottom-center left
+    { x: chartCenter - 30, y: chartSize - 400 } // Bottom-center right
+  ]
 
-  const segments = data.map(segment => {
+  let cumulativeAngle = -Math.PI / 2 // Start at the top of the circle
+
+  const segments = data.map((segment, index) => {
     const startAngle = cumulativeAngle
     const angle = (segment.percentage / totalPercentage) * 2 * Math.PI
     const endAngle = startAngle + angle
-    const midAngle = startAngle + angle / 2 // Midpoint angle for labels and lines
 
     // Update cumulative angle for the next segment
     cumulativeAngle = endAngle
 
-    // Generate arc path with segment's radius
-    const arcPath = calculateArcPath(startAngle, endAngle, segment.radius, chartCenter, chartCenter)
+    let path
 
-    return {
-      path:
-        segment.percentage === totalPercentage
-          ? `
+    // Handle the 100% case
+    if (segment.percentage === 100) {
+      path = `
         M ${chartCenter} ${chartCenter - segment.radius}
         A ${segment.radius} ${segment.radius} 0 1 1 ${chartCenter} ${chartCenter + segment.radius}
         A ${segment.radius} ${segment.radius} 0 1 1 ${chartCenter} ${chartCenter - segment.radius}
-        Z
       `
-          : `
+    } else {
+      const arcPath = calculateArcPath(startAngle, endAngle, segment.radius, chartCenter, chartCenter)
+
+      path = `
         M ${arcPath.startX} ${arcPath.startY}
-        A ${segment.radius} ${segment.radius} 0 ${arcPath.largeArcFlag} 1 ${arcPath.endX} ${arcPath.endY}`,
-      labelPosition: calculateLabelPosition(midAngle, segment.radius + 40, chartCenter, chartCenter),
-      linePosition: calculateLabelPosition(midAngle, segment.radius, chartCenter, chartCenter),
-      basePath: calculateBaseCirclePath(segment.radius, chartCenter), // Base circle path
+        A ${segment.radius} ${segment.radius} 0 ${arcPath.largeArcFlag} 1 ${arcPath.endX} ${arcPath.endY}
+      `
+    }
+
+    return {
+      path,
+      labelPosition: labelPositions[index],
       color: segment.color,
       label: segment.label,
       percentage: segment.percentage,
-      votes: segment.votes
+      votes: segment.votes,
+      connectionPoint: calculateLabelPosition(startAngle + angle / 2, segment.radius, chartCenter, chartCenter),
+      basePath: calculateBaseCirclePath(segment.radius, chartCenter) // Base circle path
     }
   })
 
@@ -72,9 +84,9 @@ const RadialPerformanceChart: React.FC<RadialPerformanceChartProps> = ({ data })
         ))}
 
         {/* Draw each segment */}
-        {segments.map((segment, index) => {
-          return <path key={`segment-${index}`} d={segment.path} stroke={segment.color} strokeWidth='8' fill='none' />
-        })}
+        {segments.map((segment, index) => (
+          <path key={`segment-${index}`} d={segment.path} stroke={segment.color} strokeWidth='8' fill='none' />
+        ))}
 
         {/* Center Dot */}
         <circle cx={chartCenter} cy={chartCenter} r='8' fill='#000' />
@@ -82,13 +94,21 @@ const RadialPerformanceChart: React.FC<RadialPerformanceChartProps> = ({ data })
         {/* Labels and Connecting Lines */}
         {segments.map((segment, index) => {
           const { x: labelX, y: labelY } = segment.labelPosition
-          const { x: lineX, y: lineY } = segment.linePosition
+          const { x: connectionX, y: connectionY } = segment.connectionPoint
+          const { x2, y2 } = calculateStraightLineCoordinates(connectionX, connectionY, labelX, labelY)
           const labelLines = splitText(segment.label, 10)
 
           return (
             <g key={`label-${index}`}>
               {/* Connecting Line */}
-              <line x1={lineX} y1={lineY} x2={labelX} y2={labelY} stroke='#000' strokeWidth='1' />
+              <line
+                x1={connectionX}
+                y1={connectionY}
+                x2={x2 < chartCenter + 100 ? x2 : x2 - 10}
+                y2={y2 > chartCenter - 100 ? y2 : y2 + 40}
+                stroke='#000'
+                strokeWidth='1'
+              />
 
               {/* Label Text */}
               <text
@@ -104,7 +124,7 @@ const RadialPerformanceChart: React.FC<RadialPerformanceChartProps> = ({ data })
                     {line}
                   </tspan>
                 ))}
-                ({segment.percentage}%)
+                <tspan> ({segment.percentage}%)</tspan>
               </text>
 
               {/* Votes Text */}

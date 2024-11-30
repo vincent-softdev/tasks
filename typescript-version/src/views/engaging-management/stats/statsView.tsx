@@ -1,13 +1,14 @@
-'use client'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-import type { IStatsViewCardProps, IStatsViewProps } from '@/types/engagementTypes'
+import type { IStatsViewCardProps, IStatsViewProps, TabKeys } from '@/types/engagementTypes'
 import TabSelector from '@/components/wizer-components/tapSelector'
 import StatsViewCard from '@/components/wizer-components/statsViewCard'
 
-type TabKeys = 'All' | 'Year' | 'Quarter' | 'Month'
+type StatsViewProps = Record<TabKeys, IStatsViewProps> & {
+  onTabChange: (tab: TabKeys) => void
+}
 
-const StatsView = (props: Record<TabKeys, IStatsViewProps>) => {
+const StatsView = (props: StatsViewProps) => {
   const [selectedTab, setSelectedTab] = useState<TabKeys>('Month')
 
   // Stats data
@@ -31,12 +32,14 @@ const StatsView = (props: Record<TabKeys, IStatsViewProps>) => {
     }
   ]
 
+  const handleTabChange = (tab: TabKeys) => {
+    setSelectedTab(tab)
+    props.onTabChange(tab) // Notify the parent component of the tab change
+  }
+
   return (
     <>
-      <TabSelector
-        options={['All', 'Year', 'Quarter', 'Month']}
-        onSelect={tab => setSelectedTab(tab as TabKeys)} // Cast the tab to TabKeys
-      />
+      <TabSelector options={['All', 'Year', 'Quarter', 'Month']} onSelect={tab => handleTabChange(tab as TabKeys)} />
       <div className='flex justify-around mt-6'>
         {statsData.map((e, idx) => {
           return <StatsViewCard key={idx} {...e} />

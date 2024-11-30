@@ -86,3 +86,48 @@ export const calculateStraightLineCoordinates = (
     return { x2: x1, y2: labelY }
   }
 }
+
+// Function to generate new radialPerformanceChartData
+export const generateRadialPerformanceChartData = (questionsAsked: number) => {
+  const percentages = [33, 50, 100, 60, 87.5]
+
+  console.log(questionsAsked)
+
+  return [
+    {
+      label: 'Admin',
+      percentage: Math.random() > 0.5 ? percentages[0] + 1 : percentages[0] - 1,
+      votes: '1/3',
+      color: '#4dc9f0',
+      radius: 70
+    },
+    {
+      label: 'Accounting',
+      percentage: Math.random() > 0.5 ? percentages[1] + 1 : percentages[1] - 1,
+      votes: '1/2',
+      color: '#68af92',
+      radius: 55
+    },
+    {
+      label: 'Design',
+      percentage: Math.random() > 0.5 ? percentages[2] + 0 : percentages[2] - 1,
+      votes: '1/1',
+      color: '#a07ffc',
+      radius: 40
+    },
+    {
+      label: 'Customer Service',
+      percentage: Math.random() > 0.5 ? percentages[3] + 0 : percentages[3] - 1,
+      votes: '3/5',
+      color: '#ffd420',
+      radius: 85
+    },
+    {
+      label: 'Sales',
+      percentage: Math.random() > 0.5 ? percentages[4] + 0 : percentages[4] - 1,
+      votes: '7/8',
+      color: '#fc8dca',
+      radius: 100
+    }
+  ]
+}
