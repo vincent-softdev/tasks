@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { calculateTotalValue, calculateArcPath, calculateLabelPosition, splitText } from '@/utils/chartUtils'
+import { calculateArcPath, calculateLabelPosition, splitText } from '@/utils/chartUtils'
 
 type ParticipationRateProps = {
   data: {
@@ -12,7 +12,7 @@ type ParticipationRateProps = {
 
 const ParticipationRate: React.FC<ParticipationRateProps> = ({ data }) => {
   // Total value for the chart
-  const total = calculateTotalValue(data)
+  const total = 100
 
   // Dimensions
   const centerX = 200
@@ -31,18 +31,22 @@ const ParticipationRate: React.FC<ParticipationRateProps> = ({ data }) => {
 
     cumulativeAngle = endAngle
 
-    const arcPath = calculateArcPath(startAngle, endAngle, radius, centerX, centerY)
+    // Handle the special case of a full-circle segment (100%)
+    const path = `M ${calculateArcPath(startAngle, endAngle, radius, centerX, centerY).startX} ${
+      calculateArcPath(startAngle, endAngle, radius, centerX, centerY).startY
+    }
+           A ${radius} ${radius} 0 ${
+             angle > Math.PI ? 1 : 0
+           } 1 ${calculateArcPath(startAngle, endAngle, radius, centerX, centerY).endX} ${
+             calculateArcPath(startAngle, endAngle, radius, centerX, centerY).endY
+           }
+           L ${centerX + innerRadius * Math.cos(endAngle)} ${centerY + innerRadius * Math.sin(endAngle)}
+           A ${innerRadius} ${innerRadius} 0 ${
+             angle > Math.PI ? 1 : 0
+           } 0 ${centerX + innerRadius * Math.cos(startAngle)} ${centerY + innerRadius * Math.sin(startAngle)} Z`
 
     return {
-      path:
-        `M ${arcPath.startX} ${arcPath.startY} A ${radius} ${radius} 0 ${
-          arcPath.largeArcFlag
-        } 1 ${arcPath.endX} ${arcPath.endY}` +
-        ` L ${centerX + innerRadius * Math.cos(endAngle)} ${
-          centerY + innerRadius * Math.sin(endAngle)
-        } A ${innerRadius} ${innerRadius} 0 ${
-          endAngle - startAngle > Math.PI ? 1 : 0
-        } 0 ${centerX + innerRadius * Math.cos(startAngle)} ${centerY + innerRadius * Math.sin(startAngle)} Z`,
+      path,
       labelPosition: calculateLabelPosition(midAngle, radius + 30, centerX, centerY),
       linePosition: calculateLabelPosition(midAngle, radius, centerX, centerY),
       color: segment.color,

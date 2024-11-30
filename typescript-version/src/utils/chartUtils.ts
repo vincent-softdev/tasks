@@ -1,7 +1,3 @@
-export const calculateTotalValue = (data: { value: number }[]): number => {
-  return data.reduce((sum, segment) => sum + segment.value, 0)
-}
-
 export const calculateArcPath = (
   startAngle: number,
   endAngle: number,
