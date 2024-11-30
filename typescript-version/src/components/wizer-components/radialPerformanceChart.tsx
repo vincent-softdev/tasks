@@ -15,13 +15,13 @@ type RadialPerformanceChartProps = {
 
 const RadialPerformanceChart: React.FC<RadialPerformanceChartProps> = ({ data }) => {
   const chartCenter = 150 // Center of the chart
-  const chartSize = 350 // Total chart width/height
+  const chartSize = 400 // Total chart width/height
 
   // Calculate total percentages for normalizing the arcs
   const totalPercentage = 100
 
   // Keep track of the cumulative angle
-  let cumulativeAngle = (-Math.PI * Math.random()) / 2 // Random initial start angle
+  let cumulativeAngle = -Math.PI / 2 // Random initial start angle
 
   const segments = data.map(segment => {
     const startAngle = cumulativeAngle
@@ -58,8 +58,8 @@ const RadialPerformanceChart: React.FC<RadialPerformanceChartProps> = ({ data })
   })
 
   return (
-    <div className='relative flex-1'>
-      <svg width={chartSize} height={chartSize}>
+    <div className='relative flex-1 flex justify-center'>
+      <svg width={chartSize} height={chartSize} overflow='visible'>
         {/* Draw base circles */}
         {segments.map((segment, index) => (
           <path
